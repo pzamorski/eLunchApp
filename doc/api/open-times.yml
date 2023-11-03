@@ -1,0 +1,141 @@
+openapi: 3.0.1
+info:
+  title: API / Open times
+  version: 1.0.0-oas3
+servers:
+  - url: http://localhost/api
+tags:
+  - name: open times
+    description: ''
+paths:
+  /open-times:
+    get:
+      tags:
+        - open times
+      summary: Pobiera listę czasów otwarcia
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OpenTimes'
+    post:
+      tags:
+        - open times
+      summary: Wstawia listę czasów otwarcia
+      requestBody:
+        description: Lista czasów otwarcia
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/OpenTimes'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OpenTimes'
+
+  /open-times/{open-time-uuid}:
+    get:
+      tags:
+        - open times
+      summary: Pobiera czas otwarcia
+      parameters:
+        - name: open-time-uuid
+          in: path
+          description: UUID pobieranego czasu otwarcia
+          required: true
+          schema:
+            type: string
+            format: UUID
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenTimes'
+        '404':
+          description: Nie istnieje
+          content: {}
+    put:
+      tags:
+        - open times
+      summary: Nadpisuje czas otwarcia
+      parameters:
+        - name: open-time-uuid
+          in: path
+          description: UUID pobieranego czasu otwarcia
+          required: true
+          schema:
+            type: string
+            format: UUID
+      requestBody:
+        description: Uaktualniany lub wstawiany czas otwarcia
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OpenTimes'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content: {}
+        '400':
+          description: Błąd walidacji
+          content: {}
+    delete:
+      tags:
+        - open times
+      summary: Usuwa czas otwarcia
+      parameters:
+        - name: open-time-uuid
+          in: path
+          description: UUID usuwanego czasu otwarcia
+          required: true
+          schema:
+            type: string
+            format: UUID
+      responses:
+        '200':
+          description: OK
+          content: {}
+components:
+  schemas:
+    OpenTimes:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: UUID
+        dayOfWeek:
+          type: string
+          enum: ["PON", "WT", "SR", "CZW", "PT", "SOB", "ND"]
+        periodTime:
+          $ref: '#/components/schemas/PeriodTime'
+        restaurant:
+          $ref: '#/components/schemas/Restaurant'
+    PeriodTime:
+      type: object
+      properties:
+        begin:
+          type: string
+          format: 'LocalTime'
+        end:
+          type: string
+          format: 'LocalTime'
+    Restaurant:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: UUID

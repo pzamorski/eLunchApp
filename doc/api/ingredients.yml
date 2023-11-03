@@ -1,0 +1,122 @@
+openapi: 3.0.1
+info:
+  title: API / Ingredients
+  version: 1.0.0-oas3
+servers:
+  - url: http://localhost/api
+tags:
+  - name: ingredients
+    description: ''
+paths:
+  /ingredients:
+    get:
+      tags:
+        - ingredients
+      summary: Pobiera listę skladników
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Ingredient'
+    post:
+      tags:
+        - ingredients
+      summary: Wstawia skladniki
+      requestBody:
+        description: Lista wstawianych skladników
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Ingredient'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Ingredient'
+  /ingredients/{ingredient-uuid}:
+    get:
+      tags:
+        - ingredients
+      summary: Pobiera skladniki
+      parameters:
+        - name: ingredient-uuid
+          in: path
+          description: UUID pobieranego skladnika
+          required: true
+          schema:
+            type: string
+            format: UUID
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ingredient'
+        '404':
+          description: Nie istnieje
+          content: {}
+    put:
+      tags:
+        - ingredients
+      summary: Nadpisuje skladnik
+      parameters:
+        - name: ingredient-uuid
+          in: path
+          description: UUID pobieranego skladnika
+          required: true
+          schema:
+            type: string
+            format: UUID
+      requestBody:
+        description: Uaktualniany lub wstawiany skladnik
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Ingredient'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content: {}
+        '400':
+          description: Błąd walidacji
+          content: {}
+    delete:
+      tags:
+        - ingredients
+      summary: Usuwa skladnik
+      parameters:
+        - name: ingredient-uuid
+          in: path
+          description: UUID usuwanego skladnika
+          required: true
+          schema:
+            type: string
+            format: UUID
+      responses:
+        '200':
+          description: OK
+          content: {}
+components:
+  schemas:
+    Ingredient:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: UUID
+        name:
+          type: string
+        isAllergen:
+          type: boolean

@@ -1,0 +1,286 @@
+openapi: 3.0.1
+info:
+  title: API / Orders
+  version: 1.0.0-oas3
+servers:
+  - url: http://localhost/api
+tags:
+  - name: orders
+    description: ''
+paths:
+  /orders:
+    get:
+      tags:
+        - orders
+      summary: Pobiera listę zamówień
+      description: 'tylko jeden z dwóch parametrów w jednym zapytaniu'
+      parameters:
+        - name: uzytkownik-uuid
+          in: query
+          description: UUID pobieranego zamowienia dla uzytkownika
+          required: false
+          schema:
+            type: string
+            format: UUID
+        - name: dostawca-uuid
+          in: query
+          description: UUID pobieranego zamowienia dla dostawcy
+          required: false
+          schema:
+            type: string
+            format: UUID
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Order'
+  /orders/{order-uuid}:
+    get:
+      tags:
+        - orders
+      summary: Pobiera zamowienie
+      parameters:
+        - name: order-uuid
+          in: path
+          description: UUID pobieranego zamowienia
+          required: true
+          schema:
+            type: string
+            format: UUID
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '404':
+          description: Nie istnieje
+          content: {}
+    put:
+      tags:
+        - orders
+      summary: Nadpisuje zamówienie
+      description: 'Usługa do dodawania lub edycji zamówienia, ale nie do obsługi statusu zamówienia.'
+      parameters:
+        - name: order-uuid
+          in: path
+          description: UUID pobieranego zamowienia
+          required: true
+          schema:
+            type: string
+            format: UUID
+      requestBody:
+        description: Uaktualniane lub wstawiane zamowienie
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Order'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content: {}
+        '400':
+          description: Błąd walidacji
+          content: {}
+    patch:
+      tags:
+        - orders
+      summary: Opłacenie zamówienia.
+      description: 'Usługa dla systemu płatności do zmiany statusu opłacenia zamówienia. Zmienia wartość "czyOplacono" Statusu Zamówienia na true oraz zdejmuje ze stanu konta Użytkownika kwotę za zamówienie.'
+      parameters:
+        - name: order-uuid
+          in: path
+          description: UUID pobieranego zamowienia
+          required: true
+          schema:
+            type: string
+            format: UUID
+      responses:
+        '200':
+          description: OK
+          content: {}
+        '400':
+          description: Błąd walidacji
+          content: {}
+    delete:
+      tags:
+        - orders
+      summary: Usuwa zamowienie
+      parameters:
+        - name: order-uuid
+          in: path
+          description: UUID usuwanego zamowienia
+          required: true
+          schema:
+            type: string
+            format: UUID
+      responses:
+        '200':
+          description: OK
+          content: {}
+  /orders/{order-uuid}/gived-out:
+    patch:
+      tags:
+        - orders
+      summary: Ustawia czas wydania zamówienia.
+      description: 'Usługa dla systemu restauracji do zmiany statusu wydania zamówienia.'
+      parameters:
+        - name: order-uuid
+          in: path
+          description: UUID pobieranego zamowienia
+          required: true
+          schema:
+            type: string
+            format: UUID
+      requestBody:
+        description: 'Należy wysłać wypełnioną wartość "czyOplacono" i "czasWydania"'
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                schema:
+                  $ref: '#/components/schemas/OrderStatus'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content: {}
+        '400':
+          description: Błąd walidacji
+          content: {}
+  /orders/{order-uuid}/delivered:
+    patch:
+      tags:
+        - orders
+      summary: Ustawia czas dostarczenia zamówienia.
+      description: 'Usługa dla systemu dostawcy do zmiany statusu dostarczenia zamówienia.'
+      parameters:
+        - name: order-uuid
+          in: path
+          description: UUID pobieranego zamowienia
+          required: true
+          schema:
+            type: string
+            format: UUID
+      requestBody:
+        description: 'Należy wysłać wypełnioną wartość "czyOplacono", "czasWydania" i "czasDostarczenia"'
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                schema:
+                  $ref: '#/components/schemas/OrderStatus'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content: {}
+        '400':
+          description: Błąd walidacji
+          content: {}
+components:
+  schemas:
+    Order:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: UUID
+        nettoPrice:
+          type: string
+          format: Decimal
+        bruttoPrice:
+          type: string
+          format: Decimal
+        discountCode:
+          $ref: '#/components/schemas/DiscountCode'
+        amountToPayBrutto:
+          type: string
+          format: Decimal
+        note:
+          type: string
+        status:
+          allOf:
+            - $ref: '#/components/schemas/OrderStatus'
+          readOnly: true
+        deliveryAddress:
+          $ref: '#/components/schemas/DeliveryAddress'
+        user:
+          $ref: '#/components/schemas/User'
+        deliverer:
+          $ref: '#/components/schemas/Deliverer'
+        restaurant:
+          $ref: '#/components/schemas/Restaurant'
+        orderItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItem'
+    User:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: UUID
+    DeliveryAddress:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: UUID
+    Restaurant:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: UUID
+    Deliverer:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: UUID
+    DiscountCode:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: UUID
+    OrderStatus:
+      type: object
+      properties:
+        orderTime:
+          type: string
+          format: Instant
+        isPaid:
+          type: boolean
+        giveOutTime:
+          type: string
+          format: Instant
+        deliveryTime:
+          type: string
+          format: Instant
+    OrderItem:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: UUID
+        quantity:
+          type: integer
+          minimum: 1
+        menuItem:
+          $ref: '#/components/schemas/MenuItem'
+    MenuItem:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: UUID

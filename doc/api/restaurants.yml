@@ -1,0 +1,167 @@
+openapi: 3.0.1
+info:
+  title: API / Restaurants
+  version: 1.0.0-oas3
+servers:
+  - url: http://localhost/api
+tags:
+  - name: restaurants
+    description: ''
+paths:
+  /restaurants:
+    get:
+      tags:
+        - restaurants
+      summary: Pobiera listę restauracji
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Restaurant'
+  /restaurants/{restaurant-uuid}:
+    get:
+      tags:
+        - restaurants
+      summary: Pobiera restauracje
+      parameters:
+        - name: restaurant-uuid
+          in: path
+          description: UUID pobieranej restauracji
+          required: true
+          schema:
+            type: string
+            format: UUID
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Restaurant'
+        '404':
+          description: Nie istnieje
+          content: {}
+    put:
+      tags:
+        - restaurants
+      summary: Nadpisuje restauracje
+      parameters:
+        - name: restaurant-uuid
+          in: path
+          description: UUID pobieranej restauracji
+          required: true
+          schema:
+            type: string
+            format: UUID
+      requestBody:
+        description: Uaktualniana lub wstawiana restauracja
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Restaurant'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content: {}
+        '400':
+          description: Błąd walidacji
+          content: {}
+    delete:
+      tags:
+        - restaurants
+      summary: Usuwa restauracje
+      parameters:
+        - name: restaurant-uuid
+          in: path
+          description: UUID usuwanej restauracji
+          required: true
+          schema:
+            type: string
+            format: UUID
+      responses:
+        '200':
+          description: OK
+          content: {}
+components:
+  schemas:
+    Restaurant:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: UUID
+        name:
+          type: string
+        logginData:
+          $ref: '#/components/schemas/LogginData'
+        companyData:
+          $ref: '#/components/schemas/CompanyData'
+        openTimes:
+          type: array
+          items:
+            $ref: '#/components/schemas/OpenTime'
+          uniqueItems: true
+        orders:
+          type: array
+          items:
+            $ref: '#/components/schemas/Order'
+        menu:
+          type: array
+          items:
+            $ref: '#/components/schemas/MenuItem'
+        discountCodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/DiscountCode'
+        archive:
+          type: string
+          enum: ["CURRENT", "ARCHIVE"]
+    CompanyData:
+      type: object
+      properties:
+        nazwa:
+          type: string
+        nip:
+          type: string
+          format: NIP
+        regon:
+          type: string
+          format: REGON
+        telefon:
+          type: string
+        email:
+          type: string
+    LogginData:
+      type: object
+      properties:
+        login:
+          type: string
+    OpenTime:
+      type: object
+      properties:
+        dzienTygodnia:
+          type: string
+          enum: ["PON", "WT", "SR", "CZW", "PT", "SOB", "ND"]
+    Order:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: UUID
+    MenuItem:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: UUID
+    DiscountCode:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: UUID

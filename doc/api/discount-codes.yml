@@ -1,0 +1,128 @@
+openapi: 3.0.1
+info:
+  title: API / Discount codes
+  version: 1.0.0-oas3
+servers:
+  - url: http://localhost/api
+tags:
+  - name: discount codes
+    description: ''
+paths:
+  /discount-codes:
+    get:
+      tags:
+        - discount codes
+      summary: Pobiera listę kodów rabatowych
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DiscountCode'
+  /discount-codes/{discount-code-uuid}:
+    get:
+      tags:
+        - discount codes
+      summary: Pobiera kod rabatowy
+      parameters:
+        - name: discount-code-uuid
+          in: path
+          description: UUID pobieranego kodu rabatowego
+          required: true
+          schema:
+            type: string
+            format: UUID
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiscountCode'
+        '404':
+          description: Nie istnieje
+          content: {}
+    put:
+      tags:
+        - discount codes
+      summary: Nadpisuje kod rabatowy
+      parameters:
+        - name: discount-code-uuid
+          in: path
+          description: UUID pobieranego kodu rabatowego
+          required: true
+          schema:
+            type: string
+            format: UUID
+      requestBody:
+        description: Uaktualniany lub wstawiany kod rabatowy
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DiscountCode'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content: {}
+        '400':
+          description: Błąd walidacji
+          content: {}
+    delete:
+      tags:
+        - discount codes
+      summary: Usuwa kod rabatowy
+      parameters:
+        - name: discount-code-uuid
+          in: path
+          description: UUID usuwanego kodu rabatowego
+          required: true
+          schema:
+            type: string
+            format: UUID
+      responses:
+        '200':
+          description: OK
+          content: {}
+components:
+  schemas:
+    DiscountCode:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: UUID
+        code:
+          type: string
+        discount:
+          type: string
+          format: Decimal
+        discountUnit:
+          type: string
+          enum: ["PERCENT", "PLN"]
+        period:
+          type: string
+          format: Period
+        menuItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/MenuItem'
+        users:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+    User:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: UUID
+    MenuItem:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: UUID

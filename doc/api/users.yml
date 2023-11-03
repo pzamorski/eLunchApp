@@ -1,0 +1,237 @@
+openapi: 3.0.1
+info:
+  title: API / Users
+  version: 1.0.0-oas3
+servers:
+  - url: http://localhost/api
+tags:
+  - name: users
+    description: ''
+paths:
+  /users:
+    get:
+      tags:
+        - users
+      summary: Pobiera listę użytkowników
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+  /users/{user-uuid}:
+    get:
+      tags:
+        - users
+      summary: Pobiera użytkownika
+      parameters:
+        - name: user-uuid
+          in: path
+          description: UUID pobieranego użytkownika
+          required: true
+          schema:
+            type: string
+            format: UUID
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: Nie istnieje
+          content: {}
+    put:
+      tags:
+        - users
+      summary: Nadpisuje użytkownika
+      parameters:
+        - name: user-uuid
+          in: path
+          description: UUID pobieranego użytkownika
+          required: true
+          schema:
+            type: string
+            format: UUID
+      requestBody:
+        description: Uaktualniany lub wstawiany użytkownik
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content: {}
+        '400':
+          description: Błąd walidacji [EwidencjaOperacji Size(max = 0)]
+          content: {}
+    delete:
+      tags:
+        - users
+      summary: Usuwa użytkownika
+      parameters:
+        - name: user-uuid
+          in: path
+          description: UUID usuwanego użytkownika
+          required: true
+          schema:
+            type: string
+            format: UUID
+      responses:
+        '200':
+          description: OK
+          content: {}
+  /users/{user-uuid}/new-operation:
+    post:
+      tags:
+        - users
+      summary: Wstawia nową operacje na ewidencji użytkownika
+      parameters:
+        - name: user-uuid
+          in: path
+          description: UUID pobieranego użytkownika
+          required: true
+          schema:
+            type: string
+            format: UUID
+      requestBody:
+        description: Wstawiana ewidencja operacji
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content: {}
+        '400':
+          description: Błąd walidacji
+          content: {}
+  /users/{user-uuid}/orders:
+    get:
+      tags:
+        - users
+      summary: Pobiera zamówienia użytkownika
+      parameters:
+        - name: user-uuid
+          in: path
+          description: UUID pobieranego użytkownika
+          required: true
+          schema:
+            type: string
+            format: UUID
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '404':
+          description: Nie istnieje
+          content: {}
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: UUID
+        personalData:
+          $ref: '#/components/schemas/PersonalData'
+        deliveryAddress:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeliveryAddress'
+        logginData:
+          $ref: '#/components/schemas/LogginData'
+        orders:
+          type: array
+          items:
+            $ref: '#/components/schemas/Order'
+        operationEvidence:
+          type: array
+          items:
+            $ref: '#/components/schemas/OperationEvidence'
+        discountCodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/DiscountCode'
+        archive:
+          type: string
+          enum: ["CURRENT", "ARCHIVE"]
+    PersonalData:
+      type: object
+      properties:
+        name:
+          type: string
+        surname:
+          type: string
+        sex:
+          type: string
+          enum: [ MALE, FEMALE, OTHER ]
+        phone:
+          type: string
+        email:
+          type: string
+    LogginData:
+      type: object
+      properties:
+        login:
+          type: string
+    DeliveryAddress:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: UUID
+        street:
+          type: string
+        streetNumber:
+          type: string
+        localNumber:
+          type: string
+        postcode:
+          type: string
+        city:
+          type: string
+        borough:
+          type: string
+        county:
+          type: string
+        state:
+          type: string
+        uzytkownik:
+          $ref: '#/components/schemas/User'
+    Order:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: UUID
+    OperationEvidence:
+      type: object
+      properties:
+        date:
+          type: string
+          format: Instant
+        type:
+          format: string
+          enum: ["DEPOSIT", "WITHDRAW", "PAYMENT"]
+        amount:
+          type: string
+          format: Decimal
+    DiscountCode:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: UUID

@@ -1,0 +1,118 @@
+openapi: 3.0.1
+info:
+  title: API / Products
+  version: 1.0.0-oas3
+servers:
+  - url: http://localhost/api
+tags:
+  - name: products
+    description: ''
+paths:
+  /products:
+    get:
+      tags:
+        - products
+      summary: Pobiera listę produktów
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+  /products/{product-uuid}:
+    get:
+      tags:
+        - products
+      summary: Pobiera produkt
+      parameters:
+        - name: product-uuid
+          in: path
+          description: UUID pobieranego produktu
+          required: true
+          schema:
+            type: string
+            format: UUID
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '404':
+          description: Nie istnieje
+          content: {}
+    put:
+      tags:
+        - products
+      summary: Nadpisuje produkt
+      parameters:
+        - name: product-uuid
+          in: path
+          description: UUID pobieranego produktu
+          required: true
+          schema:
+            type: string
+            format: UUID
+      requestBody:
+        description: Uaktualniany lub wstawiany produkty
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content: {}
+        '400':
+          description: Błąd walidacji
+          content: {}
+    delete:
+      tags:
+        - products
+      summary: Usuwa produkt
+      parameters:
+        - name: product-uuid
+          in: path
+          description: UUID usuwanego produktu
+          required: true
+          schema:
+            type: string
+            format: UUID
+      responses:
+        '200':
+          description: OK
+          content: {}
+components:
+  schemas:
+    Product:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: UUID
+        name:
+          type: string
+        dish:
+          $ref: '#/components/schemas/Dish'
+        ingredients:
+          type: array
+          items:
+            $ref: '#/components/schemas/Ingredient'
+          readOnly: true
+    Dish:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: UUID
+    Ingredient:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: UUID

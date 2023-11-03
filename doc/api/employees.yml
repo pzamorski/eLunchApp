@@ -1,0 +1,123 @@
+openapi: 3.0.1
+info:
+  title: API / Employees
+  version: 1.0.0-oas3
+servers:
+  - url: http://localhost/api
+tags:
+  - name: employees
+    description: ''
+paths:
+  /employees:
+    get:
+      tags:
+        - employees
+      summary: Pobiera listę pracowników
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Employee'
+  /employees/{employee-uuid}:
+    get:
+      tags:
+        - employees
+      summary: Pobiera pracownika
+      parameters:
+        - name: employee-uuid
+          in: path
+          description: UUID pobieranego pracownika
+          required: true
+          schema:
+            type: string
+            format: UUID
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Employee'
+        '404':
+          description: Nie istnieje
+          content: {}
+    put:
+      tags:
+        - employees
+      summary: Nadpisuje pracownika
+      parameters:
+        - name: employee-uuid
+          in: path
+          description: UUID pobieranego pracownika
+          required: true
+          schema:
+            type: string
+            format: UUID
+      requestBody:
+        description: Uaktualniany lub wstawiany pracownik
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Employee'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content: {}
+        '400':
+          description: Błąd walidacji
+          content: {}
+    delete:
+      tags:
+        - employees
+      summary: Usuwa pracownika
+      parameters:
+        - name: employee-uuid
+          in: path
+          description: UUID usuwanego pracownika
+          required: true
+          schema:
+            type: string
+            format: UUID
+      responses:
+        '200':
+          description: OK
+          content: {}
+components:
+  schemas:
+    Employee:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: UUID
+        personalData:
+          $ref: '#/components/schemas/PersonalData'
+        logginData:
+          $ref: '#/components/schemas/LogginData'
+        archiwum:
+          type: string
+          enum: ["CURRENT", "ARCHIVE"]
+    PersonalData:
+      type: object
+      properties:
+        name:
+          type: string
+        surname:
+          type: string
+        sex:
+          type: string
+          enum: [MALE, FEMALA, OTHER]
+        phone:
+          type: string
+        email:
+          type: string
+    LogginData:
+      type: object
+      properties:
+        login:
+          type: string

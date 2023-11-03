@@ -1,0 +1,129 @@
+openapi: 3.0.1
+info:
+  title: API / Menu items
+  version: 1.0.0-oas3
+servers:
+  - url: http://localhost/api
+tags:
+  - name: menu items
+    description: ''
+paths:
+  /menu-items:
+    get:
+      tags:
+        - menu items
+      summary: Pobiera listę pozycji menu
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MenuItem'
+  /menu-items/{menu-item-uuid}:
+    get:
+      tags:
+        - menu items
+      summary: Pobiera pozycję menu
+      parameters:
+        - name: menu-item-uuid
+          in: path
+          description: UUID pobieranej pozycji menu
+          required: true
+          schema:
+            type: string
+            format: UUID
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MenuItem'
+        '404':
+          description: Nie istnieje
+          content: {}
+    put:
+      tags:
+        - menu items
+      summary: Nadpisuje pozycje menu
+      parameters:
+        - name: menu-item-uuid
+          in: path
+          description: UUID pobieranej pozycji menu
+          required: true
+          schema:
+            type: string
+            format: UUID
+      requestBody:
+        description: Uaktualniana lub wstawiana pozycja menu
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MenuItem'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content: {}
+        '400':
+          description: Błąd walidacji
+          content: {}
+    delete:
+      tags:
+        - menu items
+      summary: Usuwa pozycje menu
+      parameters:
+        - name: menu-item-uuid
+          in: path
+          description: UUID usuwanej pozycji menu
+          required: true
+          schema:
+            type: string
+            format: UUID
+      responses:
+        '200':
+          description: OK
+          content: {}
+components:
+  schemas:
+    MenuItem:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: UUID
+        name:
+          type: string
+        nettoPrice:
+          type: string
+          format: Decimal
+          minimum: 0
+        vatTax:
+          type: string
+          enum: ["_0", "_5", "_8", "_23"]
+        bruttoPrice:
+          type: string
+          format: Decimal
+          minimum: 0
+        restaurant:
+          $ref: '#/components/schemas/Restaurant'
+        dishes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Dish'
+          readOnly: true
+    Restaurant:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: UUID
+    Dish:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: UUID
